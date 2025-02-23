@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/CreateUserDto';
 import { UpdateUserDto } from './dto/UpdateUserDto';
+import { UserEntity } from './entities/userEntity';
 
 @Controller('users')
 export class UsersController {
@@ -9,27 +10,43 @@ export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
     @Get() // GET /users or /users
-    findAll() {
-        return this.usersService.findAll();
+    async findAll(): Promise<UserEntity[]> {
+        const response = await this.usersService.findAll()
+
+        if (!response?.length) {
+            throw new NotFoundException('Examples are not exist')
+          }
+
+        return response
+        
     }
 
     @Get(':id') // GET /users/:id
-    findOne(@Param("id", ParseIntPipe) id: number) {
-        return this.usersService.findOne(id);
+    async findOne(@Param("id") id: string): Promise<UserEntity> {
+        const response = await this.usersService.findOne(id)
+
+        if (!response) {
+            throw new NotFoundException('Example does not exist')
+          }
+
+        return response
     }
 
     @Post() // POST /users
-    create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
-        return this.usersService.create(createUserDto);
+    async create(@Body(ValidationPipe) createUserDto: CreateUserDto): Promise<UserEntity> {
+        const response = await this.usersService.create(createUserDto)
+        return response
     }
 
-    @Patch(':id') // PATCH /users/:id
-    update(@Param("id", ParseIntPipe) id: number, @Body(ValidationPipe) updateUserDto: UpdateUserDto) {
-        return this.usersService.update(id, updateUserDto);
-    }
+    // @Patch(':id') // PATCH /users/:id
+    // async update(@Param("id") id: string, @Body(ValidationPipe) updateUserDto: UpdateUserDto): Promise<UserEntity> {
+    //     const response = await this.usersService.update(id, updateUserDto)
+    //     return response
+    // }
 
-    @Delete(':id') // DELETE /users/:id
-    delete(@Param("id", ParseIntPipe) id: number) {
-        return this.usersService.delete(id);
-    }
+    // @Delete(':id') // DELETE /users/:id
+    // async delete(@Param("id") id: string): Promise<UserEntity> {
+    //     const response = await this.usersService.delete(id)
+    //     return response
+    // }
 }
