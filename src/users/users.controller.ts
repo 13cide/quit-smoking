@@ -14,7 +14,7 @@ export class UsersController {
         const response = await this.usersService.findAll()
 
         if (!response?.length) {
-            throw new NotFoundException('Examples are not exist')
+            throw new NotFoundException('Users are not exist')
           }
 
         return response
@@ -26,7 +26,7 @@ export class UsersController {
         const response = await this.usersService.findOne(id)
 
         if (!response) {
-            throw new NotFoundException('Example does not exist')
+            throw new NotFoundException('User does not exist')
           }
 
         return response
@@ -38,11 +38,11 @@ export class UsersController {
         return response
     }
 
-    // @Patch(':id') // PATCH /users/:id
-    // async update(@Param("id") id: string, @Body(ValidationPipe) updateUserDto: UpdateUserDto): Promise<UserEntity> {
-    //     const response = await this.usersService.update(id, updateUserDto)
-    //     return response
-    // }
+    @Patch(':id') // PATCH /users/:id
+    async update(@Param("id") id: string, @Body(ValidationPipe) updateUserDto: UpdateUserDto): Promise<UserEntity> {
+        const response = await this.usersService.update(id, updateUserDto)
+        return response
+    }
 
     // @Delete(':id') // DELETE /users/:id
     // async delete(@Param("id") id: string): Promise<UserEntity> {

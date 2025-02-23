@@ -1,8 +1,9 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { UserEntity } from "./entities/userEntity";
 import { CollectionReference, Query, Timestamp } from "@google-cloud/firestore";
 import { getUniqueId } from "src/helpers/id";
 import { CreateUserDto } from "./dto/CreateUserDto";
+import { UpdateUserDto } from "./dto/UpdateUserDto";
 
 @Injectable()
 export class UsersRepository {
@@ -45,7 +46,7 @@ export class UsersRepository {
     async create(payload: CreateUserDto) {
         const time = Timestamp.now()
 
-        const validPayload = {
+        const validPayload: UserEntity = {
             id: getUniqueId(),
             username: payload.username,
             email: payload.email,
@@ -61,12 +62,38 @@ export class UsersRepository {
         return validPayload
     }
 
-    async update(id: number, updateUserDto: any) {
-        return
-    }
+    async update(id: string, updateUserDto: UpdateUserDto) {
+        const doc = await this.collection.doc(id)
+        const snapshot = await doc.get()
+    
+        if (!snapshot.exists) {
+          throw new NotFoundException('User document does not exist')
+        } 
+        let response = snapshot.data()
 
-    async delete(id: number) {
-        return
-    }
+        if (!response) {
+            throw new NotFoundException('User document does not exist')
+        }
+        response = { ...response, ...updateUserDto }
+        //const response: UserEntity = { ...snapshot.data(), ...updateUserDto }
+        response.updatedAt = Timestamp.now()
+        const changedKeys = Object.keys(updateUserDto)
+        const valuesToUpdate: UpdateUserDto = {}
+
+        for (const key of changedKeys) {
+            const newValue = response?.[key]
+            const currentValue = doc?.[key]
+
+            if (newValue !== currentValue) {
+                valuesToUpdate[key] = newValue
+            }
+        }
+
+        if (Object.keys(valuesToUpdate).length > 0) {
+            await doc.update({ ...valuesToUpdate, updatedAt: response?.updatedAt })
+        }
+
+        return response
+      }
 
 }
