@@ -46,15 +46,22 @@ export class UsersRepository {
     async create(payload: CreateUserDto) {
         const time = Timestamp.now()
 
+        // const validPayload: UserEntity = {
+        //     id: getUniqueId(),
+        //     username: payload.username,
+        //     email: payload.email,
+        //     age: payload.age,
+        //     bio: payload.bio ?? '',
+        //     createdAt: time,
+        //     updatedAt: time,
+        //   }
+
         const validPayload: UserEntity = {
             id: getUniqueId(),
-            username: payload.username,
-            email: payload.email,
-            age: payload.age,
-            bio: payload.bio ?? '',
+            ...payload,
             createdAt: time,
             updatedAt: time,
-          }
+        }
 
         const document = await this.collection.doc(validPayload.id)
         await document.set(validPayload)
