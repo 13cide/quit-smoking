@@ -1,10 +1,12 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { ChallengesModule } from './challenges/challenges.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FirestoreModule } from './firestore/firestore.modules';
+import { FirebaseApp } from './firestore/FirebaseApp';
+import { PreAuthMiddleware } from './middleware/PreAuthMiddleware';
 
 @Module({
   imports: [
@@ -23,6 +25,11 @@ import { FirestoreModule } from './firestore/firestore.modules';
     })
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, FirebaseApp],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    //consumer.apply(PreAuthMiddleware).forRoutes('*');
+  }
+  
+}

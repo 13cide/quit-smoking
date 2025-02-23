@@ -8,6 +8,6 @@ export class UserEntity {
   email: string
   age: number
   bio?: string | null
-  createdAt?: Timestamp | null
-  updatedAt?: Timestamp | null
+  createdAt: Timestamp
+  updatedAt: Timestamp
 }
