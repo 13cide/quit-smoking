@@ -96,4 +96,23 @@ export class UsersRepository {
         return response
       }
 
+      async delete(id: string) {
+        const doc = await this.collection.doc(id)
+        const snapshot = await doc.get()
+    
+        if (!snapshot.exists) {
+          throw new NotFoundException('User document does not exist')
+        }
+    
+        await doc.delete()
+
+        const response = snapshot.data()
+
+        if (!response) {
+            throw new NotFoundException('User document does not exist')
+        }
+    
+        return response
+      }
+
 }

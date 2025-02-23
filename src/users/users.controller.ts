@@ -44,9 +44,9 @@ export class UsersController {
         return response
     }
 
-    // @Delete(':id') // DELETE /users/:id
-    // async delete(@Param("id") id: string): Promise<UserEntity> {
-    //     const response = await this.usersService.delete(id)
-    //     return response
-    // }
+    @Delete(':id') // DELETE /users/:id
+    async delete(@Param("id") id: string): Promise<UserEntity> {
+        const response = await this.usersService.delete(id)
+        return response
+    }
 }
