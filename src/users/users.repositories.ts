@@ -5,6 +5,10 @@ import { getUniqueId } from "src/helpers/id";
 import { CreateUserDto } from "./dto/CreateUserDto";
 import { UpdateUserDto } from "./dto/UpdateUserDto";
 
+
+type CreateUserData = Omit<UserEntity, 'id' | 'createdAt' | 'updatedAt'>
+type UpdateUserData = Partial<CreateUserData>
+
 @Injectable()
 export class UsersRepository {
     
@@ -43,18 +47,8 @@ export class UsersRepository {
           }
     }
 
-    async create(payload: CreateUserDto) {
+    async create(payload: CreateUserData) {
         const time = Timestamp.now()
-
-        // const validPayload: UserEntity = {
-        //     id: getUniqueId(),
-        //     username: payload.username,
-        //     email: payload.email,
-        //     age: payload.age,
-        //     bio: payload.bio ?? '',
-        //     createdAt: time,
-        //     updatedAt: time,
-        //   }
 
         const validPayload: UserEntity = {
             id: getUniqueId(),
@@ -69,57 +63,46 @@ export class UsersRepository {
         return validPayload
     }
 
-    async update(id: string, updateUserDto: UpdateUserDto) {
+    async update(id: string, updateUserData: UpdateUserData) {
         const doc = await this.collection.doc(id)
-        const snapshot = await doc.get()
-    
-        if (!snapshot.exists) {
-          throw new NotFoundException('User document does not exist')
-        } 
-        let response = snapshot.data()
 
-        if (!response) {
-            throw new NotFoundException('User document does not exist')
-        }
-        response = { ...response, ...updateUserDto }
-        //const response: UserEntity = { ...snapshot.data(), ...updateUserDto }
-        response.updatedAt = Timestamp.now()
-        const changedKeys = Object.keys(updateUserDto)
-        const valuesToUpdate: UpdateUserDto = {}
+        await doc.update({ ...updateUserData, updatedAt: Timestamp.now() })
 
-        for (const key of changedKeys) {
-            const newValue = response?.[key]
-            const currentValue = doc?.[key]
+        return (await doc.get()).data() ?? null
 
-            if (newValue !== currentValue) {
-                valuesToUpdate[key] = newValue
-            }
-        }
 
-        if (Object.keys(valuesToUpdate).length > 0) {
-            await doc.update({ ...valuesToUpdate, updatedAt: response?.updatedAt })
-        }
+        // let response = (await doc.get()).data()
 
-        return response
+        // if (!response) {
+        //     return null
+        // }
+        // response = { ...response, ...updateUserDto }
+        // //const response: UserEntity = { ...snapshot.data(), ...updateUserDto }
+        // response.updatedAt = 
+        // const changedKeys = Object.keys(updateUserDto)
+        // const valuesToUpdate: UpdateUserDto = {}
+
+        // for (const key of changedKeys) {
+        //     const newValue = response?.[key]
+        //     const currentValue = doc?.[key]
+
+        //     if (newValue !== currentValue) {
+        //         valuesToUpdate[key] = newValue
+        //     }
+        // }
+
+        // if (Object.keys(valuesToUpdate).length > 0) {
+            
+        // }
+
+        // return response
       }
 
       async delete(id: string) {
         const doc = await this.collection.doc(id)
-        const snapshot = await doc.get()
-    
-        if (!snapshot.exists) {
-          throw new NotFoundException('User document does not exist')
-        }
-    
         await doc.delete()
 
-        const response = snapshot.data()
-
-        if (!response) {
-            throw new NotFoundException('User document does not exist')
-        }
-    
-        return response
+        return null
       }
 
 }

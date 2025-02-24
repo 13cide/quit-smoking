@@ -1,8 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/CreateUserDto';
 import { UpdateUserDto } from './dto/UpdateUserDto';
 import { UsersRepository } from './users.repositories';
-import { Timestamp } from '@google-cloud/firestore';
 
 @Injectable()
 export class UsersService {
@@ -21,11 +20,17 @@ export class UsersService {
     }
 
     async update(id: string, updateUserDto: UpdateUserDto) {
-        return await this.usersRepository.update(id, updateUserDto)
+        const response = await this.usersRepository.update(id, updateUserDto)
+        if (!response) {
+            return null
+        }
+        return response
     }
 
     async delete(id: string) {
-        return this.usersRepository.delete(id)
+        const res = await this.usersRepository.findOne(id)
+        await this.usersRepository.delete(id)
+        return res
     }
 
 }

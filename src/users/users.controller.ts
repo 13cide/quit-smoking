@@ -11,14 +11,7 @@ export class UsersController {
 
     @Get() // GET /users or /users
     async findAll(): Promise<UserEntity[]> {
-        const response = await this.usersService.findAll()
-
-        if (!response?.length) {
-            throw new NotFoundException('Users are not exist')
-          }
-
-        return response
-        
+        return this.usersService.findAll()
     }
 
     @Get(':id') // GET /users/:id
