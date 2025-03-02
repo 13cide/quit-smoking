@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/CreateUserDto';
-import { UpdateUserDto } from './dto/UpdateUserDto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateUserDto } from './dto/user-create.dto';
+import { UpdateUserDto } from './dto/user-update.dto';
 import { UsersRepository } from './users.repositories';
 
 @Injectable()
@@ -12,6 +12,13 @@ export class UsersService {
     }
 
     async findOne(id: string) {
+
+        // if (!snapshot.exists) {
+        //     return null
+        // } else {
+        //     return snapshot.data() || null
+        // }
+
         return this.usersRepository.findOne(id)
     }
 
@@ -29,6 +36,9 @@ export class UsersService {
 
     async delete(id: string) {
         const res = await this.usersRepository.findOne(id)
+        if (!res) {
+            throw new NotFoundException(`User with id ${id} not found`)
+        }
         await this.usersRepository.delete(id)
         return res
     }

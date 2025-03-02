@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/CreateUserDto';
-import { UpdateUserDto } from './dto/UpdateUserDto';
-import { UserEntity } from './entities/userEntity';
+import { CreateUserDto } from './dto/user-create.dto';
+import { UpdateUserDto } from './dto/user-update.dto';
+import { UserEntity } from './entities/user.entity';
 
 @Controller('users')
 export class UsersController {
@@ -15,31 +15,22 @@ export class UsersController {
     }
 
     @Get(':id') // GET /users/:id
-    async findOne(@Param("id") id: string): Promise<UserEntity> {
-        const response = await this.usersService.findOne(id)
-
-        if (!response) {
-            throw new NotFoundException('User does not exist')
-          }
-
-        return response
+    async findOne(@Param("id") id: string): Promise<UserEntity | null> {
+        return this.usersService.findOne(id)
     }
 
     @Post() // POST /users
     async create(@Body(ValidationPipe) createUserDto: CreateUserDto): Promise<UserEntity> {
-        const response = await this.usersService.create(createUserDto)
-        return response
+        return this.usersService.create(createUserDto)
     }
 
     @Patch(':id') // PATCH /users/:id
-    async update(@Param("id") id: string, @Body(ValidationPipe) updateUserDto: UpdateUserDto): Promise<UserEntity> {
-        const response = await this.usersService.update(id, updateUserDto)
-        return response
+    async update(@Param("id") id: string, @Body(ValidationPipe) updateUserDto: UpdateUserDto): Promise<UserEntity | null> {
+        return this.usersService.update(id, updateUserDto)
     }
 
     @Delete(':id') // DELETE /users/:id
     async delete(@Param("id") id: string): Promise<UserEntity> {
-        const response = await this.usersService.delete(id)
-        return response
+        return this.usersService.delete(id)
     }
 }

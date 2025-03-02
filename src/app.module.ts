@@ -6,7 +6,7 @@ import { ChallengesModule } from './challenges/challenges.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FirestoreModule } from './firestore/firestore.modules';
 import { FirebaseApp } from './firestore/FirebaseApp';
-import { PreAuthMiddleware } from './middleware/PreAuthMiddleware';
+import { PreAuthMiddleware } from './middleware/preauth.middleware';
 
 @Module({
   imports: [

@@ -1,9 +1,8 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { UserEntity } from "./entities/userEntity";
+import { Inject, Injectable } from "@nestjs/common";
+import { UserEntity } from "./entities/user.entity";
 import { CollectionReference, Query, Timestamp } from "@google-cloud/firestore";
 import { getUniqueId } from "src/helpers/id";
-import { CreateUserDto } from "./dto/CreateUserDto";
-import { UpdateUserDto } from "./dto/UpdateUserDto";
+
 
 
 type CreateUserData = Omit<UserEntity, 'id' | 'createdAt' | 'updatedAt'>
@@ -40,11 +39,7 @@ export class UsersRepository {
     async findOne(id: string): Promise<UserEntity | null> {
         const snapshot = await this.collection.doc(id).get();
 
-        if (!snapshot.exists) {
-            return null
-          } else {
-            return snapshot.data() || null
-          }
+        return snapshot.data() || null
     }
 
     async create(payload: CreateUserData) {
@@ -69,40 +64,11 @@ export class UsersRepository {
         await doc.update({ ...updateUserData, updatedAt: Timestamp.now() })
 
         return (await doc.get()).data() ?? null
-
-
-        // let response = (await doc.get()).data()
-
-        // if (!response) {
-        //     return null
-        // }
-        // response = { ...response, ...updateUserDto }
-        // //const response: UserEntity = { ...snapshot.data(), ...updateUserDto }
-        // response.updatedAt = 
-        // const changedKeys = Object.keys(updateUserDto)
-        // const valuesToUpdate: UpdateUserDto = {}
-
-        // for (const key of changedKeys) {
-        //     const newValue = response?.[key]
-        //     const currentValue = doc?.[key]
-
-        //     if (newValue !== currentValue) {
-        //         valuesToUpdate[key] = newValue
-        //     }
-        // }
-
-        // if (Object.keys(valuesToUpdate).length > 0) {
-            
-        // }
-
-        // return response
       }
 
       async delete(id: string) {
         const doc = await this.collection.doc(id)
         await doc.delete()
-
-        return null
       }
 
 }
