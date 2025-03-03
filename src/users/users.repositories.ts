@@ -23,7 +23,6 @@ export class UsersRepository {
         return query
       }
 
-
     async findAll(): Promise<UserEntity[]> {
         const list: UserEntity[] = []
         let query = this.findGenerator()
@@ -52,23 +51,22 @@ export class UsersRepository {
             updatedAt: time,
         }
 
-        const document = await this.collection.doc(validPayload.id)
+        const document = this.collection.doc(validPayload.id)
         await document.set(validPayload)
 
         return validPayload
     }
 
     async update(id: string, updateUserData: UpdateUserData) {
-        const doc = await this.collection.doc(id)
+        const doc = this.collection.doc(id)
 
         await doc.update({ ...updateUserData, updatedAt: Timestamp.now() })
 
-        return (await doc.get()).data() ?? null
-      }
+        return (await doc.get()).data()
+    }
 
-      async delete(id: string) {
-        const doc = await this.collection.doc(id)
-        await doc.delete()
-      }
+    async delete(id: string) {
+        await this.collection.doc(id).delete()
+    }
 
 }

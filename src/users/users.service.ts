@@ -12,14 +12,11 @@ export class UsersService {
     }
 
     async findOne(id: string) {
+        const data = await this.usersRepository.findOne(id)
 
-        // if (!snapshot.exists) {
-        //     return null
-        // } else {
-        //     return snapshot.data() || null
-        // }
+        if (!data) throw new NotFoundException(`User with ID ${id} not found`)
 
-        return this.usersRepository.findOne(id)
+        return data
     }
 
     async create(createUserDto: CreateUserDto) {
@@ -27,20 +24,20 @@ export class UsersService {
     }
 
     async update(id: string, updateUserDto: UpdateUserDto) {
-        const response = await this.usersRepository.update(id, updateUserDto)
-        if (!response) {
-            return null
-        }
-        return response
+        const res = await this.usersRepository.update(id, updateUserDto)
+
+        if (!res) throw new NotFoundException(`User with id ${id} not found`)
+
+        return res
     }
 
     async delete(id: string) {
-        const res = await this.usersRepository.findOne(id)
-        if (!res) {
-            throw new NotFoundException(`User with id ${id} not found`)
-        }
+        const doc = await this.usersRepository.findOne(id)
+        if (!doc) throw new NotFoundException(`User with id ${id} not found`)
+
         await this.usersRepository.delete(id)
-        return res
+
+        return doc
     }
 
 }

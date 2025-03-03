@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/user-create.dto';
 import { UpdateUserDto } from './dto/user-update.dto';
@@ -15,7 +15,7 @@ export class UsersController {
     }
 
     @Get(':id') // GET /users/:id
-    async findOne(@Param("id") id: string): Promise<UserEntity | null> {
+    async findOne(@Param("id") id: string): Promise<UserEntity> {
         return this.usersService.findOne(id)
     }
 
@@ -25,7 +25,7 @@ export class UsersController {
     }
 
     @Patch(':id') // PATCH /users/:id
-    async update(@Param("id") id: string, @Body(ValidationPipe) updateUserDto: UpdateUserDto): Promise<UserEntity | null> {
+    async update(@Param("id") id: string, @Body(ValidationPipe) updateUserDto: UpdateUserDto): Promise<UserEntity> {
         return this.usersService.update(id, updateUserDto)
     }
 
