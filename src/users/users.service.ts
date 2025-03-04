@@ -1,8 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dto/user-create.dto';
-import { UpdateUserDto } from './dto/user-update.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersRepository } from './users.repositories';
-import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
@@ -27,12 +26,10 @@ export class UsersService {
         return this.usersRepository.create(createUserDto)
     }
 
-    async registerUser(registerUserDTo: RegisterUserDto) {
-        return this.usersRepository.registerUser(registerUserDTo)
-    }
-
     async loginUser(loginDto: LoginDto) {
-        return this.usersRepository.loginUser(loginDto)
+        const data = await this.usersRepository.loginUser(loginDto)
+        console.log("Bearer " + data.idToken)
+        return data
     }
 
     async update(id: string, updateUserDto: UpdateUserDto) {

@@ -14,6 +14,7 @@ export class PreAuthMiddleware implements NestMiddleware {
 
   use(req: Request, res: Response, next: () => void) {
     const token = req.headers.authorization;
+    //const token = localStorage.getItem('token');
     if (token != null && token != '') {
       this.auth
         .verifyIdToken(token.replace('Bearer ', ''))
@@ -27,6 +28,7 @@ export class PreAuthMiddleware implements NestMiddleware {
           PreAuthMiddleware.accessDenied(req.url, res);
         });
     } else {
+      console.log('sosi')
       PreAuthMiddleware.accessDenied(req.url, res);
     }
   }

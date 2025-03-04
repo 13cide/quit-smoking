@@ -1,16 +1,12 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { UserEntity } from "./entities/user.entity";
 import { CollectionReference, Query, Timestamp } from "@google-cloud/firestore";
-import { getUniqueId } from "src/helpers/id";
-import { RegisterUserDto } from "./dto/register-user.dto";
 import * as firebase from "firebase-admin";
 import { LoginDto } from "./dto/login.dto";
 import axios from "axios";
-
-
-
-type CreateUserData = Omit<UserEntity, 'id' | 'createdAt' | 'updatedAt'>
-type UpdateUserData = Partial<CreateUserData>
+import { RegisterUserDto } from "./dto/register-user.dto";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
 
 @Injectable()
 export class UsersRepository {
@@ -46,15 +42,30 @@ export class UsersRepository {
         return snapshot.data() || null
     }
 
-    async create(payload: CreateUserData) {
+    async registerUser(registerUserDTo: RegisterUserDto) {
+        try {
+            const userRecord = await firebase.auth().createUser({
+                displayName: registerUserDTo.username,
+                email: registerUserDTo.email,
+                password: registerUserDTo.password,
+            });
+            return userRecord.uid;
+        } catch (error) {
+            console.error('Error creating user:', error);
+            throw new Error('User registration failed');
+        }
+    }
+
+    async create(payload: CreateUserDto) {
         const time = Timestamp.now()
 
         const validPayload: UserEntity = {
-            id: getUniqueId(),
+            id: await this.registerUser(payload),
             ...payload,
             createdAt: time,
             updatedAt: time,
         }
+        console.log(validPayload)
 
         const document = this.collection.doc(validPayload.id)
         await document.set(validPayload)
@@ -62,26 +73,6 @@ export class UsersRepository {
         return validPayload
     }
 
-    async registerUser(registerUserDTo: RegisterUserDto) {
-        console.log(registerUserDTo);
-        try {
-            const userRecord = await firebase.auth().createUser({
-                displayName: registerUserDTo.username,
-                email: registerUserDTo.email,
-                password: registerUserDTo.password,
-            });
-
-            console.log('User Record:', userRecord);
-            return userRecord;
-        } catch (error) {
-            console.error('Error creating user:', error);
-            throw new Error('User registration failed'); // Handle errors gracefully
-        }
-    }
-
-
-
-    
     async loginUser(payload: LoginDto) {
         const { email, password } = payload;
         try {
@@ -98,6 +89,7 @@ export class UsersRepository {
           }
         }
       }
+
       private async signInWithEmailAndPassword(email: string, password: string) {
         const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.APIKEY}`;
         return await this.sendPostRequest(url, {
@@ -106,6 +98,7 @@ export class UsersRepository {
           returnSecureToken: true,
         });
       }
+      
       private async sendPostRequest(url: string, data: any) {
         try {
           const response = await axios.post(url, data, {
@@ -117,15 +110,10 @@ export class UsersRepository {
         }
       }
 
-
-
-
-
-
-    async update(id: string, updateUserData: UpdateUserData) {
+    async update(id: string, updateUserDto: UpdateUserDto) {
         const doc = this.collection.doc(id)
 
-        await doc.update({ ...updateUserData, updatedAt: Timestamp.now() })
+        await doc.update({ ...updateUserDto, updatedAt: Timestamp.now() })
 
         return (await doc.get()).data()
     }

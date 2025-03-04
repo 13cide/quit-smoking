@@ -12,11 +12,4 @@ export class RegisterUserDto {
     @IsString()
     @IsNotEmpty()
     password: string;
-
-    @IsNumber()
-    @IsNotEmpty()
-    age: number;
-
-    @IsString()
-    bio: string; 
 }

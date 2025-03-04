@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -29,7 +29,7 @@ import { PreAuthMiddleware } from './middleware/preauth.middleware';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    //consumer.apply(PreAuthMiddleware).forRoutes('*');
+    consumer.apply(PreAuthMiddleware).forRoutes({path: 'users/*', method: RequestMethod.GET});
   }
   
 }
