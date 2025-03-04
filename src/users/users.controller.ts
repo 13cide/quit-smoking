@@ -1,8 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/user-create.dto';
 import { UpdateUserDto } from './dto/user-update.dto';
 import { UserEntity } from './entities/user.entity';
+import { RegisterUserDto } from './dto/register-user.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('users')
 export class UsersController {
@@ -17,6 +19,18 @@ export class UsersController {
     @Get(':id') // GET /users/:id
     async findOne(@Param("id") id: string): Promise<UserEntity> {
         return this.usersService.findOne(id)
+    }
+
+    @Post('register') // POST /users/register
+    @UsePipes(new ValidationPipe({ transform: true }))
+    registerUser(@Body() registerUserDTo: RegisterUserDto) {
+        return this.usersService.registerUser(registerUserDTo);
+    }
+
+    @Post('login') // POST /users/login
+    @UsePipes(new ValidationPipe({ transform: true }))
+    loginUser(@Body() loginDto: LoginDto) {
+        return this.usersService.loginUser(loginDto);
     }
 
     @Post() // POST /users

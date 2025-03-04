@@ -20,8 +20,6 @@ export class PreAuthMiddleware implements NestMiddleware {
         .then(async (decodedToken) => {
           req['user'] = {
             email: decodedToken.email,
-            roles: (decodedToken.roles || []),
-            type: decodedToken.type,
           };
           next();
         })
