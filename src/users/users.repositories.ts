@@ -98,7 +98,7 @@ export class UsersRepository {
           returnSecureToken: true,
         });
       }
-      
+
       private async sendPostRequest(url: string, data: any) {
         try {
           const response = await axios.post(url, data, {
@@ -119,6 +119,7 @@ export class UsersRepository {
     }
 
     async delete(id: string) {
+        firebase.auth().deleteUser(id)
         await this.collection.doc(id).delete()
     }
 
