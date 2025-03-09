@@ -21,21 +21,18 @@ export class UsersController {
     }
     
     @Post() // POST /users
-    @UsePipes(new ValidationPipe({ transform: true }))
-    async create(@Body(ValidationPipe) createUserDto: CreateUserDto): Promise<UserEntity> {
+    async create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
         return this.usersService.create(createUserDto)
     }
 
     @Post('login') // POST /users/login
-    @UsePipes(new ValidationPipe({ transform: true }))
     loginUser(@Body() loginDto: LoginDto) {
         return this.usersService.loginUser(loginDto)
     }
-
     
-
     @Patch(':id') // PATCH /users/:id
-    async update(@Param("id") id: string, @Body(ValidationPipe) updateUserDto: UpdateUserDto): Promise<UserEntity> {
+    async update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto): Promise<UserEntity> {
+        console.log(updateUserDto)
         return this.usersService.update(id, updateUserDto)
     }
 

@@ -28,14 +28,13 @@ export class PreAuthMiddleware implements NestMiddleware {
           PreAuthMiddleware.accessDenied(req.url, res);
         });
     } else {
-      console.log('sosi')
       PreAuthMiddleware.accessDenied(req.url, res);
     }
   }
 
   private static accessDenied(url: string, res: Response) {
-    res.status(403).json({
-      statusCode: 403,
+    res.status(401).json({
+      statusCode: 401,
       timestamp: new Date().toISOString(),
       path: url,
       message: 'access denied',
